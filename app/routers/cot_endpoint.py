@@ -8,6 +8,8 @@ from app import models, database
 
 from pydantic import BaseModel
 
+from app.cot import build_cot_xml, send_to_tak_server
+
 router = APIRouter()
 
 # Data yang dikirim dari ESP32
@@ -37,5 +39,7 @@ def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
     db.add(location)
     db.commit()
 
-    # TODO: kirim ke TAK Server (langkah 4)
-    return {"status": "received", "device": data.id}
+    cot_xml = build_cot_xml(uid=f"{data.id}.gps", lat=data.lat, lon=data.lon)
+    success = send_to_tak_server(cot_xml)
+    # return {"status": "received", "device": data.id}
+    return {"status": "sent" if success else "failed", "device": data.id}
