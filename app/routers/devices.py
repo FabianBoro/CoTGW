@@ -15,7 +15,7 @@ from datetime import datetime
 
 router = APIRouter()
 
-@router.post("/location")
+@router.post("/devices/location")
 def submit_location(data: schemas.LocationCreate, db: Session = Depends(get_db)):
     # Cek apakah device sudah terdaftar
     print("data received:", data)
