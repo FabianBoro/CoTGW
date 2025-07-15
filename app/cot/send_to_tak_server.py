@@ -1,0 +1,21 @@
+import requests
+
+# Konfigurasi endpoint TAK Server
+TAK_SERVER_URL = "https://<IP_TAK_SERVER>:8089/"  # Ganti IP dengan IP aktual
+CERT_FILE = "webadmin.pem"  # Gabungan client cert + key
+CA_FILE = "webadmin.pem"    # CA cert (bisa sama file jika bundle)
+
+def send_to_tak_server(cot_xml: str) -> bool:
+    try:
+        response = requests.post(
+            TAK_SERVER_URL,
+            data=cot_xml,
+            headers={"Content-Type": "application/xml"},
+            cert=CERT_FILE,
+            verify=CA_FILE,
+            timeout=5
+        )
+        return response.status_code == 200
+    except Exception as e:
+        print(f"[ERROR] Gagal kirim CoT ke TAK Server: {e}")
+        return False
