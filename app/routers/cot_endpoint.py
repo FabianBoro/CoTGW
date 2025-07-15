@@ -50,6 +50,8 @@ def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
     success = send_to_tak_server(cot_xml)
     print("[DEBUG] Sending XML to TAK Server:")
     print(cot_xml)
+    print("\n[INFO] Mengirim ke TAK Server...")
+    print("Sukses kirim?" , success)
 
 
     # return {"status": "received", "device": data.id}
