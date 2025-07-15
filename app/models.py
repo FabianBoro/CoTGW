@@ -12,6 +12,7 @@ class Device(Base):
     device_id = Column(String, unique=True, index=True) 
     name = Column(String, default="Unnamed Device")
     last_seen = Column(DateTime, default=datetime.utcnow)
+    callsign = Column(String, nullable=True)
 
     #relasi dengan loc
     locations = relationship("Location", back_populates="device")
