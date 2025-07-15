@@ -24,10 +24,12 @@ def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
     # Cari device, jika belum ada, buat
     device = db.query(models.Device).filter(models.Device.id == data.id).first()
     if not device:
-        device = models.Device(id=data.id, last_seen=datetime.utcnow())
+        device = models.Device(id=data.id, last_seen=datetime.utcnow(), callsign=data.id)
         db.add(device)
     else:
         device.last_seen = datetime.utcnow()
+        if not device.callsign:
+            device.callsign = data.id  # Amankan agar tidak None
 
     # Simpan lokasi baru
     location = models.Location(
@@ -38,14 +40,17 @@ def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
     )
     db.add(location)
     db.commit()
-
+    callsign = device.callsign or data.id
     cot_xml = build_cot_xml(
         uid=f"{data.id}.gps",
         lat=data.lat,
         lon=data.lon,
-        callsign=device.callsign or data.id
+        callsign=callsign
     )
     success = send_to_tak_server(cot_xml)
+    print("[DEBUG] Sending XML to TAK Server:")
+    print(cot_xml)
+
 
     # return {"status": "received", "device": data.id}
     return {
