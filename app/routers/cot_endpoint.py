@@ -39,7 +39,17 @@ def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
     db.add(location)
     db.commit()
 
-    cot_xml = build_cot_xml(uid=f"{data.id}.gps", lat=data.lat, lon=data.lon)
+    cot_xml = build_cot_xml(
+        uid=f"{data.id}.gps",
+        lat=data.lat,
+        lon=data.lon,
+        callsign=device.callsign or data.id
+    )
     success = send_to_tak_server(cot_xml)
+
     # return {"status": "received", "device": data.id}
-    return {"status": "sent" if success else "failed", "device": data.id}
+    return {
+        "status": "sent" if success else "failed",
+        "device": data.id,
+        "callsign": device.callsign
+    }
