@@ -8,7 +8,7 @@ from app import models, database
 
 from pydantic import BaseModel
 
-from app.cot import build_cot_xml, send_to_tak_server
+from app.cot import build_cot_xml1, send_to_tak_server1
 
 router = APIRouter()
 
@@ -41,13 +41,13 @@ def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
     db.add(location)
     db.commit()
     callsign = device.callsign or data.id
-    cot_xml = build_cot_xml(
+    cot_xml = build_cot_xml1(
         uid=f"{data.id}.gps",
         lat=data.lat,
         lon=data.lon,
         callsign=callsign
     )
-    success = send_to_tak_server(cot_xml)
+    success = send_to_tak_server1(cot_xml)
     print("[DEBUG] Sending XML to TAK Server:")
     print(cot_xml)
     print("\n[INFO] Mengirim ke TAK Server...")
