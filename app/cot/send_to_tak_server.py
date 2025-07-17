@@ -2,8 +2,8 @@ import requests
 
 # Konfigurasi endpoint TAK Server
 TAK_SERVER_URL = "https://172.15.5.150:8089/"  # Ganti IP dengan IP aktual
-CERT_FILE = "certs/webadmin.pem"  # Gabungan client cert + key
-CA_FILE = "certs/webadmin.pem"    # CA cert (bisa sama file jika bundle)
+CERT_FILE = "webadmin.pem"  # Gabungan client cert + key
+CA_FILE = "webadmin.pem"    # CA cert (bisa sama file jika bundle)
 
 def send_to_tak_server(cot_xml: str) -> bool:
     try:
