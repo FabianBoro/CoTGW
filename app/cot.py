@@ -20,7 +20,7 @@ def build_cot_xml1(uid, lat, lon, callsign="ESP32 EC25"):
 
     return cot_template.strip()
 
-def send_to_tak_server1(xml_string, host="172.15.5.160", port=8089, cert="atak.pem"):
+def send_to_tak_server1(xml_string, host="172.15.5.150", port=8089, cert="webadmin.pem"):
     try:
         context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         context.load_cert_chain(certfile=cert, keyfile=cert)
