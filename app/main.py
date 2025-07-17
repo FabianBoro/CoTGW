@@ -3,8 +3,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import devices, cot_endpoint
+import logging
 
 app = FastAPI(title="CoT Gateway Web Admin")
+logging.basicConfig(level=logging.DEBUG)
 
 # CORS Middleware
 app.add_middleware(
