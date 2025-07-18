@@ -1,6 +1,6 @@
 # app/routers/cot_endpoint.py
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from datetime import datetime
 
@@ -22,7 +22,20 @@ class CoTData(BaseModel):
     ts: datetime = None  # optional, kalau tidak ada pakai now()
 
 @router.post("/")
-def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
+async def receive_cot(
+    request: Request,
+    data: CoTData,
+    db: Session = Depends(database.get_db)
+):
+    client_verify = request.headers.get("x-ssl-client-verify")
+    client_dn = request.headers.get("x-ssl-client-dn")
+
+    if client_verify != "SUCCESS":
+        raise HTTPException(status_code=401, detail="Client certificate not valid")
+
+    # Misalnya hanya client dengan CN=esp32-001 yang diizinkan
+    if not client_dn or "CN=esp32-001" not in client_dn:
+        raise HTTPException(status_code=403, detail="Unauthorized device")
     # Cari device, jika belum ada, buat
     device = db.query(models.Device).filter(models.Device.id == data.id).first()
     if not device:
