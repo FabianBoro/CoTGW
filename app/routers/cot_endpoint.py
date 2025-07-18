@@ -8,7 +8,9 @@ from app import models, database
 
 from pydantic import BaseModel
 
-from app.cot import build_cot_xml, send_to_tak_server
+# from app.cot import build_cot_xml1, send_to_tak_server1
+from app.cot.build_cot_xml import build_cot_xml
+from app.cot.send_to_tak_server import send_to_tak_server
 
 router = APIRouter()
 
@@ -24,10 +26,12 @@ def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
     # Cari device, jika belum ada, buat
     device = db.query(models.Device).filter(models.Device.id == data.id).first()
     if not device:
-        device = models.Device(id=data.id, last_seen=datetime.utcnow())
+        device = models.Device(id=data.id, last_seen=datetime.utcnow(), callsign=data.id)
         db.add(device)
     else:
         device.last_seen = datetime.utcnow()
+        if not device.callsign:
+            device.callsign = data.id  # Amankan agar tidak None
 
     # Simpan lokasi baru
     location = models.Location(
@@ -38,8 +42,23 @@ def receive_cot(data: CoTData, db: Session = Depends(database.get_db)):
     )
     db.add(location)
     db.commit()
-
-    cot_xml = build_cot_xml(uid=f"{data.id}.gps", lat=data.lat, lon=data.lon)
+    callsign = device.callsign or data.id
+    cot_xml = build_cot_xml(
+        uid=f"{data.id}.gps",
+        lat=data.lat,
+        lon=data.lon,
+        callsign=callsign
+    )
     success = send_to_tak_server(cot_xml)
+    print("[DEBUG] Sending XML to TAK Server:")
+    print(cot_xml)
+    print("\n[INFO] Mengirim ke TAK Server...")
+    print("Sukses kirim?" , success)
+
+
     # return {"status": "received", "device": data.id}
-    return {"status": "sent" if success else "failed", "device": data.id}
+    return {
+        "status": "sent" if success else "failed",
+        "device": data.id,
+        "callsign": device.callsign
+    }

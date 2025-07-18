@@ -5,7 +5,7 @@ import ssl
 import socket
 from datetime import datetime, timedelta
 
-def build_cot_xml(uid, lat, lon, callsign="ESP32 EC25"):
+def build_cot_xml1(uid, lat, lon, callsign="ESP32 EC25"):
     now = datetime.utcnow()
     stale = now + timedelta(minutes=10)
 
@@ -14,13 +14,13 @@ def build_cot_xml(uid, lat, lon, callsign="ESP32 EC25"):
         <point lat="{lat}" lon="{lon}" hae="5.0" ce="3.0" le="1.0"/>
         <detail>
             <contact callsign="{callsign}"/>
-            <takv device="Quectel EC25" os="ATcommand" version="1.0" platform="ESP32"/>
+            <takv device="Quectel EC25" os="ATcommand" version="1.0" platform="ESP321"/>
         </detail>
     </event>"""
 
     return cot_template.strip()
 
-def send_to_tak_server(xml_string, host="172.15.5.160", port=8089, cert="atak.pem"):
+def send_to_tak_server1(xml_string, host="172.15.5.150", port=8089, cert="webadmin.pem"):
     try:
         context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         context.load_cert_chain(certfile=cert, keyfile=cert)

@@ -15,9 +15,10 @@ from datetime import datetime
 
 router = APIRouter()
 
-@router.post("/location")
+@router.post("/devices/location")
 def submit_location(data: schemas.LocationCreate, db: Session = Depends(get_db)):
     # Cek apakah device sudah terdaftar
+    print("data received:", data)
     device = db.query(models.Device).filter(models.Device.device_id == data.device_id).first()
     if not device:
         raise HTTPException(status_code=404, detail="Device not found")
